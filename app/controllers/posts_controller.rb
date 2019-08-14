@@ -10,6 +10,6 @@ class PostsController < ApplicationController
   # GET /post/{id}
   def show
     @post = Post.find(params[:id])
-    render json: @json, status: :ok
+    render json: @post, status: :ok
   end
 end

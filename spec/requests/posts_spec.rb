@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'json'
+#require 'byebug'
 
 RSpec.describe 'posts endpoint', type: :request do
   describe 'GET /posts is empty' do
@@ -16,18 +16,19 @@ RSpec.describe 'posts endpoint', type: :request do
 
   describe 'With data in the database' do
     # describe "GET /posts is successfully"
+    let!(:posts) { create_list(:post, 10, published: true) }
+
     before { get '/posts' }
-
-    let(:posts) { create_list(:post, 10, published: true) }
-
+    
     it 'should return all the published posts' do
+      #byebug
       payload = JSON.parse(response.body)
       expect(payload.size).to eq(posts.size)
       expect(response).to have_http_status(200)
     end
 
     describe 'GET /posts/{id}' do
-      let(:posts) { create(:post) }
+      let!(:post) { create(:post) }
 
       it 'should return a posts' do
         get "/posts/#{post.id}"
