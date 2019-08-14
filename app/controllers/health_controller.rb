@@ -1,6 +1,7 @@
-class HealthController < ApplicationController
+# frozen_string_literal: true
 
-    def health 
-        render json: {api: 'OK'}, status: :ok
-    end 
-end 
+class HealthController < ApplicationController
+  def health
+    render json: { api: 'OK' }, status: :ok
+  end
+end
