@@ -39,4 +39,84 @@ RSpec.describe 'posts endpoint', type: :request do
       end
     end
   end
+
+  describe 'POST /posts' do
+    let!(:user) { create(:user) }
+
+    it 'should create a post' do
+      req_payload = {
+        post: {
+          title: 'titulo',
+          content: 'content',
+          publised: false,
+          user_id: user.id
+        }
+      }
+
+      # POST Http
+      post '/posts', params: req_payload
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['id']).to_not be_empty
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'should return a error message on invalid a post' do
+      req_payload = {
+        post: {
+
+          content: 'content',
+          publised: false,
+          user_id: user.id
+        }
+      }
+
+      # POST Http
+      post '/posts', params: req_payload
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['error']).to_not be_empty
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+
+  describe 'PUT /posts' do
+    let!(:post_db) { create(:post) }
+
+    it 'should create a post' do
+      req_payload = {
+        post: {
+          title: 'titulo',
+          content: 'content',
+          publised: true 
+          
+        }
+      }
+
+      # PUT Http
+      put "/posts/#{post_db}", params: req_payload
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['id']).to eq(post_db.id)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'should return a error message on invalid a post' do
+      req_payload = {
+        post: {
+          title: nil,
+          content: nil,
+          publised: false,
+        }
+      }
+
+      # PUT Http
+      put "/posts/#{post_db}", params: req_payload
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['error']).to_not be_empty
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
 end
