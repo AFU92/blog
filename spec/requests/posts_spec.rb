@@ -39,4 +39,26 @@ RSpec.describe 'posts endpoint', type: :request do
       end
     end
   end
+
+  describe 'POST /posts' do
+    let!(:user) { create(:user) }
+
+    it 'should create a post' do
+      req_payload = {
+        post: {
+          title: 'titulo',
+          content: 'content',
+          publised: false,
+          user_id: user.id
+        }
+      }
+
+      # POST Http
+      post '/posts', params: req_payload
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['id']).to_not be_empty
+      expect(response).to have_http_status(:created)
+    end
+  end
 end
