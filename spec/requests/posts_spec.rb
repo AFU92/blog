@@ -1,16 +1,30 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'byebug'
+# require 'byebug'
 
 RSpec.describe 'Posts', type: :request do
   describe 'GET /posts is empty' do
-    before { get '/posts' }
-
     it 'should return OK' do
+      get '/posts'
       payload = JSON.parse(response.body)
       expect(payload).to be_empty
       expect(response).to have_http_status(200)
+    end
+
+    describe 'Search' do
+      let!(:world) { create(:published_post, title: 'Hello world') }
+      let!(:rails) { create(:published_post, title: 'Hello Rails Developer') }
+      let!(:dev) { create(:published_post, title: 'Backend Developer') }
+
+      it 'should filter post by title' do 
+        get '/posts?search=Hello'
+        payload = JSON.parse(response.body)
+        expect(payload).to_not be_empty
+        expect(payload.size).to eq(2)
+        expect(payload.map { |p| p['id'] }.sort).to eq([world.id, rails.id].sort)
+        expect(response).to have_http_status(200)
+      end
     end
   end
 
@@ -36,6 +50,12 @@ RSpec.describe 'Posts', type: :request do
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
       expect(payload['id']).to eq(post.id)
+      expect(payload['title']).to eq(post.title)
+      expect(payload['published']).to eq(post.published)
+      expect(payload['content']).to eq(post.content)
+      expect(payload['autor']['name']).to eq(post.user.name)
+      expect(payload['autor']['email']).to eq(post.user.email)
+      expect(payload['autor']['id']).to eq(post.user.id)
       expect(response).to have_http_status(200)
     end
   end
