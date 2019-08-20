@@ -3,6 +3,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.3'
 
+# NOT REQUERE IRB
+gem 'irb', require: false
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.3'
 # Use sqlite3 as the database for Active Record
@@ -40,6 +43,7 @@ group :test do
   gem 'faker'
   gem 'database_cleaner'
 end
+
 
 group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
