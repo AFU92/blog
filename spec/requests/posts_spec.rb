@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# require 'byebug'
+require 'byebug'
 
-RSpec.describe 'posts endpoint', type: :request do
+RSpec.describe 'Posts', type: :request do
   describe 'GET /posts is empty' do
     before { get '/posts' }
 
@@ -16,27 +16,27 @@ RSpec.describe 'posts endpoint', type: :request do
 
   describe 'With data in the database' do
     # describe "GET /posts is successfully"
-    let!(:posts) { create_list(:post, 10, published: true) }
 
-    before { get '/posts' }
+    let!(:posts) { create_list(:post, 10, published: true) }
 
     it 'should return all the published posts' do
       # byebug
+      get '/posts'
       payload = JSON.parse(response.body)
       expect(payload.size).to eq(posts.size)
       expect(response).to have_http_status(200)
     end
+  end
 
-    describe 'GET /posts/{id}' do
-      let!(:post) { create(:post) }
+  describe 'GET /post/{id}' do
+    let!(:post) { create(:post) }
 
-      it 'should return a posts' do
-        get "/posts/#{post.id}"
-        payload = JSON.parse(response.body)
-        expect(payload).to_not be_empty
-        expect(payload['id']).to eq(post.id)
-        expect(response).to have_http_status(200)
-      end
+    it 'should return a post' do
+      get "/posts/#{post.id}"
+      payload = JSON.parse(response.body)
+      expect(payload).to_not be_empty
+      expect(payload['id']).to eq(post.id)
+      expect(response).to have_http_status(200)
     end
   end
 
@@ -48,30 +48,29 @@ RSpec.describe 'posts endpoint', type: :request do
         post: {
           title: 'titulo',
           content: 'content',
-          publised: false,
+          published: false,
           user_id: user.id
         }
       }
 
-      # POST Http
+      # POST HTTP
       post '/posts', params: req_payload
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
-      expect(payload['id']).to_not be_empty
+      expect(payload['id']).to_not be_nil
       expect(response).to have_http_status(:created)
     end
 
-    it 'should return a error message on invalid a post' do
+    it 'should return error message on invalid post' do
       req_payload = {
         post: {
-
           content: 'content',
-          publised: false,
+          published: false,
           user_id: user.id
         }
       }
 
-      # POST Http
+      # POST HTTP
       post '/posts', params: req_payload
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
@@ -80,39 +79,37 @@ RSpec.describe 'posts endpoint', type: :request do
     end
   end
 
-
-  describe 'PUT /posts' do
-    let!(:post_db) { create(:post) }
+  describe 'PUT /posts/{id}' do
+    let!(:article) { create(:post) }
 
     it 'should create a post' do
       req_payload = {
         post: {
           title: 'titulo',
           content: 'content',
-          publised: true 
-          
+          published: true
         }
       }
 
-      # PUT Http
-      put "/posts/#{post_db}", params: req_payload
+      # PUT HTTP
+      put "/posts/#{article.id}", params: req_payload
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
-      expect(payload['id']).to eq(post_db.id)
+      expect(payload['id']).to eq(article.id)
       expect(response).to have_http_status(:ok)
     end
 
-    it 'should return a error message on invalid a post' do
+    it 'should return error message on invalid post' do
       req_payload = {
         post: {
           title: nil,
           content: nil,
-          publised: false,
+          published: false
         }
       }
 
-      # PUT Http
-      put "/posts/#{post_db}", params: req_payload
+      # PUT HTTP
+      put "/posts/#{article.id}", params: req_payload
       payload = JSON.parse(response.body)
       expect(payload).to_not be_empty
       expect(payload['error']).to_not be_empty
